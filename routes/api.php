@@ -1,41 +1,50 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\TodoListController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
-
 // Routes for Subjects
-Route::get('/subjects', [SubjectController::class, 'index']);
-Route::post('/subjects', [SubjectController::class, 'store']);
-Route::get('/subjects/{id}', [SubjectController::class, 'show']);
-Route::put('/subjects/{id}', [SubjectController::class, 'update']);
-Route::delete('/subjects/{id}', [SubjectController::class, 'destroy']);
-
-// Route for calculating total score of a subject
-Route::get('/subjects/{id}/calculate-total-score', [SubjectController::class, 'calculateTotalScore']);
+Route::prefix('subjects')->group(function () {
+    Route::get('/', [SubjectController::class, 'index']);
+    Route::post('/', [SubjectController::class, 'store']);
+    Route::get('/{id}', [SubjectController::class, 'show']);
+    Route::put('/{id}', [SubjectController::class, 'update']);
+    Route::delete('/{id}', [SubjectController::class, 'destroy']);
+    Route::get('/{id}/calculate-total-score', [SubjectController::class, 'calculateTotalScore']);
+});
 
 // Routes for Students
-Route::get('/students', [StudentController::class, 'index']);
-Route::post('/students', [StudentController::class, 'store']);
-Route::get('/students/{id}', [StudentController::class, 'show']);
-Route::put('/students/{id}', [StudentController::class, 'update']);
-Route::delete('/students/{id}', [StudentController::class, 'destroy']);
+Route::prefix('students')->group(function () {
+    Route::get('/', [StudentController::class, 'index']);
+    Route::post('/', [StudentController::class, 'store']);
+    Route::get('/{id}', [StudentController::class, 'show']);
+    Route::put('/{id}', [StudentController::class, 'update']);
+    Route::delete('/{id}', [StudentController::class, 'destroy']);
+    Route::get('/{id}/calculate-average-score', [StudentController::class, 'calculateAverageScore']);
+});
 
-// Route for calculating average score of a student
-Route::get('/students/{id}/calculate-average-score', [StudentController::class, 'calculateAverageScore']);
+// Routes for Todos
+Route::prefix('todos')->group(function () {
+    Route::post('/', [TodoListController::class, 'store']);
+    Route::get('/', [TodoListController::class, 'getTodoList']);
+    Route::get('/{id}', [TodoListController::class, 'show']);
+    Route::put('/{id}', [TodoListController::class, 'update']);
+    Route::delete('/{id}', [TodoListController::class, 'destroy']);
+});
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// Routes authentication
+// Route::post('/register', [AuthController::class, 'register']);
+// Route::post('/login', [AuthController::class, 'login']);
+// Route::middleware('auth.jwt')->get('/user', [AuthController::class, 'getUser']);
+
+Route::group(['middleware' => 'jwt.auth'], function () {
+    Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::post('/refresh', [AuthController::class, 'refresh'])->name('refresh');
+    Route::post('/me', [AuthController::class, 'me'])->name('me');
+    Route::get('/profile',  [AuthController::class, 'getAuthenticatedUser']);
 });

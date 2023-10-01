@@ -41,9 +41,12 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
+            // \App\Http\Middleware\Authenticate::class,
             'throttle:api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+
+
     ];
 
     /**
@@ -63,5 +66,12 @@ class Kernel extends HttpKernel
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
+        'jwt.refresh' => 'Tymon\JWTAuth\Middleware\RefreshToken',
+        // 'auth.jwt' => \App\Http\Middleware\Authenticate::class,
+        'auth.jwt'  => 'Tymon\JWTAuth\Middleware\GetUserFromToken',
+        // 'auth.api' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
+
+
+
     ];
 }
